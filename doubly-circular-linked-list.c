@@ -117,7 +117,26 @@ int initialize(listNode** h) {
 
 /* 메모리 해제 */
 int freeList(listNode* h){
-
+	listNode* p;
+	if (h->rlink == h) //리스트에 값이 없다면 h만 free
+	{
+		free(h);
+		return 0;
+	}
+	if (h->rlink->rlink == h) // 리스트에 값이 하나이면 그 값 free
+		free(h->rlink);
+	else // 아니라면 차례로 free
+	{
+		p = h->rlink->rlink;
+		while (p != h)
+		{
+			free(p->llink);
+			p = p->rlink;
+		}
+        //반복문을 나왔으므로 h다음의 값 부터 마지막 값 빼고는 다 free 됨
+        free(p->llink);
+	}
+	free(h); // 리스트의 값들을 다 free 한 후 headNode 도 free
 	return 0;
 }
 
@@ -161,7 +180,28 @@ void printList(listNode* h) {
  * list에 key에 대한 노드하나를 추가
  */
 int insertLast(listNode* h, int key) {
-
+    listNode* node = (listNode*)malloc(sizeof(listNode));
+	listNode* p;
+	if (h->rlink == h) //빈 리스트이면 
+	{
+		node->key = key;
+		h->rlink = node;
+		h->llink = node;
+		node->rlink = h;
+		node->llink = h;
+	}
+	else
+	{
+		p = h->rlink;
+		node->key = key;
+		while (p->rlink != h)
+			p = p->rlink;
+		//반복문을 나왔다면 p는 리스트의 가장 마지막을 가리키고 있다
+		p->rlink = node;
+		h->llink = node;
+		node->rlink = h;
+		node->llink = p;
+	}
 	return 1;
 }
 
@@ -180,8 +220,23 @@ int deleteLast(listNode* h) {
  * list 처음에 key에 대한 노드하나를 추가
  */
 int insertFirst(listNode* h, int key) {
-
-
+    listNode* node = (listNode*)malloc(sizeof(listNode));
+	if (h->rlink == h) //빈 리스트이면 
+	{
+		node->key = key;
+		node->rlink = h;
+		node->llink = h;
+		h->rlink = node;
+		h->llink = node;
+	}
+	else 
+	{
+		node->key = key;
+		node->rlink = h->rlink;
+		node->llink = h;
+		h->rlink->llink = node;
+		h->rlink = node;
+	}
 	return 1;
 }
 
@@ -190,10 +245,29 @@ int insertFirst(listNode* h, int key) {
  * list의 첫번째 노드 삭제
  */
 int deleteFirst(listNode* h) {
-
-
+    listNode* p = h->rlink;
+	if (p == h) // 리스트가 비어있다면
+	{
+		printf("Already empty list\n");
+		return 0;
+	}
+	else if (p->rlink == h) //리스트에 원소가 하나라면
+	{
+		p->llink = NULL;
+		p->rlink = NULL;
+		free(p);
+		h->rlink = h;
+		h->llink = h;
+	}
+	else //리스트에 원소가 두 개 이상이라면
+	{
+		h->rlink = p->rlink;
+		p->rlink->llink = h;
+		p->llink = NULL;
+		p->rlink = NULL;
+		free(p);
+	}
 	return 1;
-
 }
 
 
