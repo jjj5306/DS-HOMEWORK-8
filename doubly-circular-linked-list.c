@@ -210,8 +210,38 @@ int insertLast(listNode* h, int key) {
  * list의 마지막 노드 삭제
  */
 int deleteLast(listNode* h) {
-
-
+	listNode* p;
+	listNode* pre;
+	if (h->rlink == h) //리스트가 비어있다면
+	{
+		printf("Already empty list\n");
+		return 0;
+	}
+	else if (h->rlink->rlink == h) //리스트에 원소가 하나라면
+	{
+		p = h->rlink; //p는 리스트의 첫 번째 값을 가리킨다
+		p->rlink = NULL;
+		p->llink = NULL;
+		free(p);
+		h->rlink = h;
+		h->llink = h;
+	}
+	else //리스트에 원소가 두 개 이상이라면
+	{
+		p = h->rlink->rlink; //p는 두 번째 값을
+		pre = h->rlink; //pre는 첫 번째 값을 가리킨다
+		while (p->rlink != h)
+		{
+			p = p->rlink;
+			pre = pre->rlink;
+		}
+		//반복문을 나왔으므로 p는 가장 마지막을 가리키고 있다
+		p->rlink = NULL;
+		p->llink = NULL;
+		pre->rlink = h;
+		h->llink = pre;
+		free(p);
+	}
 	return 1;
 }
 
