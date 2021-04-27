@@ -306,8 +306,62 @@ int deleteFirst(listNode* h) {
  * 리스트의 링크를 역순으로 재 배치
  */
 int invertList(listNode* h) {
-
-
+	listNode* p;
+	listNode* pre;
+	listNode* next;
+	listNode* first;
+	if (h->rlink == h || h->rlink->rlink == h) //리스트에 값이 없거나 하나라면 그냥 종료
+		return 0;
+	else if (h->rlink->rlink->rlink == h) //리스트에 값이 두 개라면 그 두개를 바꿈
+	{
+		p = h->rlink->rlink;
+		pre = h->rlink;
+		h->rlink = p;
+		h->llink = pre;
+		pre->rlink = h;
+		pre->llink = p;
+		p->rlink = pre;
+		p->llink = h;
+	}
+	else //리스트에 값이 세 개 이상이라면
+	{
+		first = h->rlink; //리스트의 첫 번째 주소 저장
+		pre = h->rlink;
+		p = pre->rlink;
+		next = p->rlink;
+		/* 맨 처음에는 이걸 한 번 실행한다*/
+		p->rlink = pre;
+		pre->llink = p;
+		pre->rlink = h;
+		if (next->rlink == h) //만약 리스트의 원소가 세 개이면 next의 순서를 정렬하고 종료한다.
+		{
+			p->llink = next;
+			next->rlink = p;
+			next->llink = h;
+			h->rlink = next;
+			h->llink = pre;
+			return 0;
+		}
+		pre = p;
+		p = next;
+		next = next->rlink;
+		while (next->rlink != h) // next가 리스트의 마지막 일 때 까지 반복
+		{
+			p->rlink = pre;
+			pre->llink = p;
+			pre = p;
+			p = next;
+			next = next->rlink;
+		}
+		/* 반복문을 나왔으므로 현재 상태는 h->rlink 에서 p까지 invert 완료*/
+		p->rlink = pre;
+		pre->llink = p;
+		p->llink = next;
+		next->rlink = p;
+		next->llink = h;
+		h->rlink = next;
+		h->llink = first;
+	}
 	return 0;
 }
 
